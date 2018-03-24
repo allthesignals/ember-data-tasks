@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import { task, all } from 'ember-concurrency';
+import { task, all, waitForProperty } from 'ember-concurrency';
 
 export default Ember.Mixin.create({
   // public
@@ -12,7 +12,11 @@ export default Ember.Mixin.create({
   },
 
   _afterModelTask: task(function* (tasksHash) {
-    yield all(Object.values(tasksHash));
+    const tasks = Object.values(tasksHash);
+    yield waitForProperty(
+      all(tasks), 'state', 'finished'
+    );
+
     this.afterModelTasks();
   }),
 });
